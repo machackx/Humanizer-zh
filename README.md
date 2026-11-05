@@ -4,6 +4,10 @@
 
 这是一份由 Agent 读取执行的编辑指导，不是独立的检测程序。它不能证明文章由谁撰写，也不保证通过任何 AI 检测器。
 
+本仓库默认按技术随笔风格调整语气：短段落、口语用词、中英文之间不加空格。正式文本不套用，也可以随时关闭，见下文[默认风格](#默认风格)。
+
+> 2026-11-04 更新：新增默认声音档案 [voices/tech-blog.md](voices/tech-blog.md)，默认按技术随笔风格润色。详见 [更新记录](CHANGELOG.md)。
+
 > 2026-09-23 更新：重写了规则和示例，明确保留事实、作者立场和文体。普通的排比、破折号和连接词不再一律修改。详见 [更新记录](CHANGELOG.md)。
 
 ## 安装
@@ -11,16 +15,18 @@
 ### 方法一：通过 npx 一键安装（推荐）
 
 ```bash
-npx skills add https://github.com/op7418/Humanizer-zh.git
+npx skills add https://github.com/machackx/Humanizer-zh.git
 ```
 
 这是最简单的安装方式，会自动将技能安装到正确的目录。
+
+默认风格只存在于本仓库。从上游 [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh) 安装的版本没有 `voices/` 目录，也不会默认套用这个风格。
 
 ### 方法二：通过 Git 克隆
 
 ```bash
 # 克隆到 Claude Code 的 skills 目录
-git clone https://github.com/op7418/Humanizer-zh.git ~/.claude/skills/humanizer-zh
+git clone https://github.com/machackx/Humanizer-zh.git ~/.claude/skills/humanizer-zh
 ```
 
 ### 方法三：手动安装
@@ -33,9 +39,13 @@ git clone https://github.com/op7418/Humanizer-zh.git ~/.claude/skills/humanizer-
 3. 确保文件夹结构如下：
    ```
    ~/.claude/skills/humanizer-zh/
-   ├── SKILL.md       # 技能定义文件（中文版）
-   └── README.md      # 说明文档
+   ├── SKILL.md           # 技能定义文件（中文版）
+   ├── README.md          # 说明文档
+   └── voices/
+       └── tech-blog.md   # 默认声音档案（技术随笔风格）
    ```
+
+   `voices/` 目录需要和 `SKILL.md` 放在一起，否则默认风格不会生效。
 
 ### 验证安装
 
@@ -64,9 +74,31 @@ git clone https://github.com/op7418/Humanizer-zh.git ~/.claude/skills/humanizer-
 
 只审阅时说明“给出建议，不修改文件”。有作者样本时可一并提供，Skill 会借鉴表达习惯，但不会把样本中的经历、数据或观点搬入原文。
 
+### 默认风格
+
+没有提供样本时，Skill 会读取 [voices/tech-blog.md](voices/tech-blog.md)，按技术随笔风格调整语气：一句一段，逗号停顿，口语用词（“把”“跑”“搭”“比如”），中英文之间不加空格，作者本来就在下判断的地方可以用“我觉得”。
+
+| 文体 | 处理方式 |
+|---|---|
+| 个人经验分享、博客、技术观点长文、教程、工具介绍 | 全部套用 |
+| 新闻快讯、产品发布报道 | 只换用词和标点，不加第一人称 |
+| 正式商务、学术、法律文本，邮件和书信 | 不套用，保留原文语气 |
+
+- 关闭：在请求里写“保持原文语气”或“不用默认风格”。
+- 换风格：附上别的作者样本，样本优先于默认档案。
+- 调整风格：直接编辑 `voices/tech-blog.md`。
+
+默认风格只改写法，保真要求不变：不新增经历、数据、比喻或结尾套话，“可能”“尚未”“只有……才”这类限定照样保留。
+
+> 原文：本节将介绍如何配置缓存。缓存开启后，可以复用已经取得的结果，但目前尚未验证其对写入速度的影响。
+>
+> 默认风格：这一节说说怎么配置缓存。
+>
+> 缓存开了以后，已经拿到的结果可以复用，不过它对写入速度有没有影响，目前还没验证。
+
 ## 改写示例
 
-以下均为教学用输入，没有未展示的补充材料。
+以下均为教学用输入，没有未展示的补充材料。这些示例用来说明保真边界，按“保持原文语气”展示；默认风格下措辞会更口语，保留的信息相同。
 
 **产品介绍，缺少数据：**
 
@@ -128,7 +160,7 @@ git clone https://github.com/op7418/Humanizer-zh.git ~/.claude/skills/humanizer-
 
 ## 验证
 
-[测试说明](tests/README.md)包含 18 个短文本案例、一个 Markdown 文件样例和结构检查脚本。本次更新还做了旧版与修订版的长文对照，检查数字、条件、归因、作者态度和文件结构。单次、有限样例不能代表所有模型和文体；不能用字数下降或模型自评分证明效果。
+[测试说明](tests/README.md)包含 21 个短文本案例（其中 3 个检查默认风格）、一个 Markdown 文件样例和结构检查脚本。本次更新还做了旧版与修订版的长文对照，检查数字、条件、归因、作者态度和文件结构。单次、有限样例不能代表所有模型和文体；不能用字数下降或模型自评分证明效果。
 
 ## 来源与许可
 
@@ -137,5 +169,6 @@ git clone https://github.com/op7418/Humanizer-zh.git ~/.claude/skills/humanizer-
 - [Humanizer-zh PR #34](https://github.com/op7418/Humanizer-zh/pull/34)：示例保真修复的对照参考。本修订没有直接合并该分支。
 - [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop)：简洁表达与编辑检查的参考来源。
 - [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)：原项目的观察来源。
+- 默认声音档案 `voices/tech-blog.md`：依据用户提供的样本文章整理。仓库中不包含样本原文，档案里的示例都是另写的教学用句。
 
 遵循仓库中的 [MIT License](LICENSE)。
